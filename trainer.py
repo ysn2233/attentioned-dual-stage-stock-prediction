@@ -36,14 +36,14 @@ class Trainer:
                 batch_end = i + batch_size
                 if (batch_end >= self.train_size):
                     batch_end = self.train_size
-                x = self.to_variable(x_train[i: batch_end])
-                y = self.to_variable(y_train[i: batch_end])
-                y_seq = self.to_variable(y_seq_train[i: batch_end])
-                if x.dim() == 2:
-                    x = x.unsqueeze(2)
-                code = self.encoder(Variable(x))
-                y_res = self.decoder(code, Variable(y_seq))
-                loss = self.loss_func(y_res, Variable(y))
+                var_x = self.to_variable(x_train[i: batch_end])
+                var_y = self.to_variable(y_train[i: batch_end])
+                var_y_seq = self.to_variable(y_seq_train[i: batch_end])
+                if var_x.dim() == 2:
+                    var_x = var_x.unsqueeze(2)
+                code = self.encoder(var_x)
+                y_res = self.decoder(code, var_y_seq)
+                loss = self.loss_func(y_res, var_y)
                 loss.backward()
                 self.encoder_optim.step()
                 self.decoder_optim.step()
@@ -76,12 +76,12 @@ class Trainer:
             batch_end = i + batch_size
             if batch_end > x.shape[0]:
                 batch_end = x.shape[0]
-            x_input = self.to_variable(x[i: batch_end])
-            y_input = self.to_variable(y_seq[i: batch_end])
-            if x_input.dim() == 2:
-                x_input = x_input.unsqueeze(2)
-            code = self.encoder(x_input)
-            y_res = self.decoder(code, y_input)
+            var_x_input = self.to_variable(x[i: batch_end])
+            var_y_input = self.to_variable(y_seq[i: batch_end])
+            if var_x_input.dim() == 2:
+                var_x_input = var_x_input.unsqueeze(2)
+            code = self.encoder(var_x_input)
+            y_res = self.decoder(code, var_y_input)
             for j in range(i, batch_end):
                 y_pred[j] = y_res[j - i, -1]
             i = batch_end
