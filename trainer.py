@@ -36,12 +36,11 @@ class Trainer:
                 batch_end = i + batch_size
                 if (batch_end >= self.train_size):
                     batch_end = self.train_size
-                x = torch.from_numpy(x_train[i: batch_end]).float()
-                y = torch.from_numpy(y_train[i: batch_end]).float()
+                x = self.to_variable(x_train[i: batch_end])
+                y = self.to_variable(y_train[i: batch_end])
+                y_seq = self.to_variable(y_seq_train[i: batch_end])
                 if x.dim() == 2:
                     x = x.unsqueeze(2)
-                y_seq = torch.from_numpy(y_seq_train[i: batch_end]).float()
-
                 code = self.encoder(Variable(x))
                 y_res = self.decoder(code, Variable(y_seq))
                 loss = self.loss_func(y_res, Variable(y))
@@ -77,8 +76,8 @@ class Trainer:
             batch_end = i + batch_size
             if batch_end > x.shape[0]:
                 batch_end = x.shape[0]
-            x_input = Variable(torch.from_numpy(x[i: batch_end])).float()
-            y_input = Variable(torch.from_numpy(y_seq[i: batch_end])).float()
+            x_input = self.to_variable(x[i: batch_end])
+            y_input = self.to_variable(y_seq[i: batch_end])
             if x_input.dim() == 2:
                 x_input = x_input.unsqueeze(2)
             code = self.encoder(x_input)
@@ -92,6 +91,11 @@ class Trainer:
         self.encoder.load_state_dict(torch.load(encoder_path))
         self.decoder.load_state_dict(torch.load(decoder_path))
 
+    def to_variable(self, x):
+        if torch.cuda.is_available():
+            return Variable(torch.from_numpy(x).float()).cuda()
+        else:
+            return Variable(torch.from_numpy(x).float())
 
 
 
