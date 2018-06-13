@@ -47,26 +47,27 @@ class Trainer:
                 loss.backward()
                 self.encoder_optim.step()
                 self.decoder_optim.step()
-                print('[%d], loss is %f' % (epoch, 10000 * loss.data[0]))
+                # print('[%d], loss is %f' % (epoch, 10000 * loss.data[0]))
                 loss_sum += loss.data[0]
                 i = batch_end
             print('epoch [%d] finished, the average loss is %f' % (epoch, loss_sum))
             if (epoch + 1) % (interval) == 0 or epoch + 1 == num_epochs:
-                torch.save(self.encoder.state_dict(), 'models/encoder' + str(epoch + 1) + '.model')
-                torch.save(self.decoder.state_dict(), 'models/decoder' + str(epoch + 1) + '.model')
-
+                torch.save(self.encoder.state_dict(), 'models/encoder' + str(epoch + 1) + '-norm' + '.model')
+                torch.save(self.decoder.state_dict(), 'models/decoder' + str(epoch + 1) + '-norm' + '.model')
 
     def test(self, num_epochs, batch_size):
         x_train, y_train, y_seq_train = self.dataset.get_train_set()
         x_test, y_test, y_seq_test = self.dataset.get_test_set()
         y_pred_train = self.predict(x_train, y_train, y_seq_train, batch_size)
         y_pred_test = self.predict(x_test, y_test, y_seq_test, batch_size)
-        plt.figure()
-        plt.plot(range(1, 1 + self.train_size), y_train, label='train')
-        plt.plot(range(1 + self.train_size, 1 + self.train_size + self.test_size), y_test, label='ground truth')
-        plt.plot(range(1, 1 + self.train_size), y_pred_train, label='predicted train')
-        plt.plot(range(1 + self.train_size, 1 + self.train_size + self.test_size), y_pred_test, label='predicted test')
-        plt.savefig('results/res-' + str(num_epochs) + '.png')
+        plt.figure(figsize=(8,6), dpi=100)
+        plt.plot(range(2000, self.train_size), y_train[2000:], label='train truth', color='black')
+        plt.plot(range(self.train_size, self.train_size + self.test_size), y_test, label='ground truth', color='black')
+        plt.plot(range(2000, self.train_size), y_pred_train[2000:], label='predicted train', color='red')
+        plt.plot(range(self.train_size, self.train_size + self.test_size), y_pred_test, label='predicted test', color='blue')
+        plt.xlabel('Days')
+        plt.ylabel('Stock price of AAPL.US(USD)')
+        plt.savefig('results/res-' + str(num_epochs) +'-' + str(batch_size) + '.png')
 
 
     def predict(self, x, y, y_seq, batch_size):
@@ -87,9 +88,10 @@ class Trainer:
             i = batch_end
         return y_pred
 
+
     def load_model(self, encoder_path, decoder_path):
-        self.encoder.load_state_dict(torch.load(encoder_path))
-        self.decoder.load_state_dict(torch.load(decoder_path))
+        self.encoder.load_state_dict(torch.load(encoder_path, map_location=lambda storage, loc: storage))
+        self.decoder.load_state_dict(torch.load(decoder_path, map_location=lambda storage, loc: storage))
 
     def to_variable(self, x):
         if torch.cuda.is_available():
@@ -102,7 +104,7 @@ class Trainer:
 def getArgParser():
     parser = argparse.ArgumentParser(description='Train the dual-stage attention-based model on stock')
     parser.add_argument(
-        '-e', '--epoch', type=int, required=True,
+        '-e', '--epoch', type=int, default=1,
         help='the number of epochs')
     parser.add_argument(
         '-b', '--batch', type=int, default=1,
@@ -119,6 +121,10 @@ def getArgParser():
     parser.add_argument(
         '-t', '--test', action='store_true',
         help='train or test')
+    parser.add_argument(
+        '-m', '--model', type=str, default='',
+        help='the model name(after encoder/decoder)'
+    )
     return parser
 
 
@@ -130,9 +136,12 @@ if __name__ == '__main__':
     interval = args.interval
     lr = args.lrate
     test = args.test
+    mname = args.model
     trainer = Trainer(config.DRIVING, config.TARGET, 10, split, lr)
     if not test:
         trainer.train_minibatch(num_epochs, batch_size, interval)
     else:
-        trainer.load_model('models/encoder50.model', 'models/decoder50.model')
-        trainer.test(num_epochs, batch_size)
+        encoder_name = 'models/encoder' + mname + '.model'
+        decoder_name = 'models/decoder' + mname + '.model'
+        trainer.load_model(encoder_name, decoder_name)
+        trainer.test(mname, batch_size)

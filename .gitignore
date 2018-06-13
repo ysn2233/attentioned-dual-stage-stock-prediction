@@ -1,0 +1,5 @@
+__pycache__/*
+*.model
+*.png
+.idea
+.DS_Store
