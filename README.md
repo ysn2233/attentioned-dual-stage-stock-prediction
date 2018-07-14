@@ -1,5 +1,10 @@
 ### DA-LSTM
 
+This is an implementation of paper ["A Dual-Stage Attention-Based Recurrent Neural Network for Time Series Prediction"](https://arxiv.org/pdf/1704.02971). I only did a test to predict the price of AAPL.US by its historical data as well as the price of its opponent MSFT.US. 
+
+#### Dataset
+Downloaded from [NASDAQ 100 STOCK DATA](http://cseweb.ucsd.edu/~yaq007/NASDAQ100_stock_data.html).
+
 #### Argument
 
 `-e`, `--epoch` - the number of epochs
