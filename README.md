@@ -1,6 +1,6 @@
 ### DA-LSTM
 
-####Argument
+#### Argument
 
 `-e`, `--epoch` - the number of epochs
 
@@ -24,7 +24,7 @@ Traing 500 epochs, with batch-size 128, save models every 100 epochs.
 Python3 trainer -e 500 -b 128 -i 100
 ```
 
-####Sample test
+#### Sample test
 
 Test data use model "encoder50" and "decoder50"
 
