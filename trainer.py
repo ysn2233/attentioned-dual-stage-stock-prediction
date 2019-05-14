@@ -48,7 +48,7 @@ class Trainer:
                 self.encoder_optim.step()
                 self.decoder_optim.step()
                 # print('[%d], loss is %f' % (epoch, 10000 * loss.data[0]))
-                loss_sum += loss.data[0]
+                loss_sum += loss.data.item()
                 i = batch_end
             print('epoch [%d] finished, the average loss is %f' % (epoch, loss_sum))
             if (epoch + 1) % (interval) == 0 or epoch + 1 == num_epochs:
