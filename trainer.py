@@ -10,6 +10,7 @@ from model import AttnEncoder, AttnDecoder
 from dataset import Dataset
 from torch import optim
 import config
+import os
 
 class Trainer:
 
@@ -137,6 +138,10 @@ if __name__ == '__main__':
     lr = args.lrate
     test = args.test
     mname = args.model
+    if not os.path.exists('models'):
+        os.makedirs('models')
+    if not os.path.exists('results'):
+        os.makedirs('results')
     trainer = Trainer(config.DRIVING, config.TARGET, 10, split, lr)
     if not test:
         trainer.train_minibatch(num_epochs, batch_size, interval)
