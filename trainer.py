@@ -51,8 +51,8 @@ class Trainer:
                 # print('[%d], loss is %f' % (epoch, 10000 * loss.data[0]))
                 loss_sum += loss.data.item()
                 i = batch_end
-            print('epoch [%d] finished, the average loss is %f' % (epoch, loss_sum))
             if (epoch + 1) % (interval) == 0 or epoch + 1 == num_epochs:
+                print('epoch [%d] finished, the average loss is %f' % (epoch, loss_sum))
                 torch.save(self.encoder.state_dict(), 'models/encoder' + str(epoch + 1) + '-norm' + '.model')
                 torch.save(self.decoder.state_dict(), 'models/decoder' + str(epoch + 1) + '-norm' + '.model')
 
@@ -114,8 +114,8 @@ def getArgParser():
         '-s', '--split', type=float, default=0.8,
         help='the split ratio of validation set')
     parser.add_argument(
-        '-i', '--interval', type=int, default=1,
-        help='save models every interval epoch')
+        '-i', '--interval', type=int, default=10,
+        help='save models/print loss every interval epoch')
     parser.add_argument(
         '-l', '--lrate', type=float, default=0.01,
         help='learning rate')
