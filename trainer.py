@@ -53,8 +53,8 @@ class Trainer:
                 i = batch_end
             if (epoch + 1) % (interval) == 0 or epoch + 1 == num_epochs:
                 print('epoch [%d] finished, the average loss is %f' % (epoch, loss_sum))
-                torch.save(self.encoder.state_dict(), 'models/encoder' + str(epoch + 1) + '-norm' + '.model')
-                torch.save(self.decoder.state_dict(), 'models/decoder' + str(epoch + 1) + '-norm' + '.model')
+                torch.save(self.encoder.state_dict(), 'models/encoder' + str(epoch + 1) + '.model')
+                torch.save(self.decoder.state_dict(), 'models/decoder' + str(epoch + 1) + '.model')
 
     def test(self, num_epochs, batch_size):
         x_train, y_train, y_seq_train = self.dataset.get_train_set()
