@@ -7,12 +7,16 @@ class Dataset:
     def __init__(self, driving_csv, target_csv, T, split_ratio=0.8, normalized=False):
         stock_frame1 = pd.read_csv(driving_csv)
         stock_frame2 = pd.read_csv(target_csv)
-        if stock_frame1.shape[0] > stock_frame2.shape[0]:
-            stock_frame1 = self.crop_stock(stock_frame1, stock_frame2['Date'][0]).reset_index()
+        if 'Close' in stock_frame1.columns:
+          if stock_frame1.shape[0] > stock_frame2.shape[0]:
+              stock_frame1 = self.crop_stock(stock_frame1, stock_frame2['Date'][0]).reset_index()
+          else:
+              stock_frame2 = self.crop_stock(stock_frame2, stock_frame1['Date'][0]).reset_index()
+          stock_frame1 = stock_frame1['Close'].fillna(method='pad')
+          stock_frame2 = stock_frame2['Close'].fillna(method='pad')
         else:
-            stock_frame2 = self.crop_stock(stock_frame2, stock_frame1['Date'][0]).reset_index()
-        stock_frame1 = stock_frame1['Close'].fillna(method='pad')
-        stock_frame2 = stock_frame2['Close'].fillna(method='pad')
+          stock_frame1 = stock_frame1['NDX'].fillna(method='pad')
+          stock_frame2 = stock_frame2['NDX'].fillna(method='pad')
         self.train_size = int(split_ratio * (stock_frame2.shape[0] - T - 1))
         self.test_size = stock_frame2.shape[0] - T  - 1 - self.train_size
         if normalized:
